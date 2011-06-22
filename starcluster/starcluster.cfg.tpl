@@ -6,7 +6,7 @@
 # configure the default cluster template to use when starting a cluster
 # defaults to 'smallcluster' defined below. this template should be usable
 # out-of-the-box provided you've configured your keypair correctly
-DEFAULT_TEMPLATE=smallcluster
+DEFAULT_TEMPLATE=RUMcluster
 # enable experimental features for this release
 ENABLE_EXPERIMENTAL=False
 
@@ -32,7 +32,7 @@ KEY_LOCATION=./lib/clusterkey.pem
 
 # Sections starting with "cluster" define your cluster templates
 # Section name is the name you give to your cluster template e.g.:
-[cluster smallcluster]
+[cluster RUMcluster]
 # change this to the name of one of the keypair sections defined above 
 KEYNAME = clusterkey
 
@@ -47,8 +47,6 @@ CLUSTER_USER = sgeadmin
 CLUSTER_SHELL = bash
 
 # AMI for cluster nodes.
-# The base i386 StarCluster AMI is ami-d1c42db8
-# The base x86_64 StarCluster AMI is ami-a5c42dcc
 NODE_IMAGE_ID = ami-0af31963
 # instance type for all cluster nodes 
 # (options: m1.large, c1.xlarge, m1.small, c1.medium, m1.xlarge, m2.4xlarge, m2.2xlarge)
@@ -75,42 +73,9 @@ VOLUMES = RUMrun
 # (see "Configuring StarCluster Plugins" below for an example of defining a plugin section)
 #PLUGINS = myplugin, myplugin2
 
-###########################################
-## Defining Additional Cluster Templates ##
-###########################################
-
-# You can also define multiple cluster templates.
-# You can either supply all configuration options as with smallcluster above, or
-# create an EXTENDS=<cluster_name> variable in the new cluster section to use all 
-# settings from <cluster_name> as defaults. Below are a couple of example
-# cluster templates that use the EXTENDS feature:
-
-# [cluster mediumcluster]
-# Declares that this cluster uses smallcluster as defaults
-# EXTENDS=smallcluster
-# This section is the same as smallcluster except for the following settings:
-# KEYNAME=my-other-gsg-keypair
-# NODE_INSTANCE_TYPE = c1.xlarge
-# CLUSTER_SIZE=8
-# VOLUMES = biodata2
-
-# [cluster largecluster]
-# Declares that this cluster uses mediumcluster as defaults
-# EXTENDS=mediumcluster
-# This section is the same as mediumcluster except for the following variables:
-# CLUSTER_SIZE=16
-
 #############################
 ## Configuring EBS Volumes ##
 #############################
-
-# Using EBS volumes with StarCluster is relatively straight forward. You create
-# a [volume] section that represents an EBS volume. The section name is a tag
-# for your volume. This tag is used in the VOLUMES setting in a cluster template 
-# to declare that an EBS volume is to be mounted and nfs shared on the cluster.
-# (see the commented VOLUMES setting in the 'smallcluster' template above)
-# Below are some examples of defining and configuring EBS volumes to be used
-# with StarCluster:
 
 # Sections starting with "volume" define your EBS volumes
 # Section name tags your volume e.g.:
@@ -120,45 +85,7 @@ VOLUMES = RUMrun
 # MOUNT_PATH = /home
 
 [volume RUMrun]
-VOLUME_ID = vol-bf650dd4
+VOLUME_ID = vol-zzzzzzzz
 MOUNT_PATH = /mnt/RUM/
 PARTITION = 1
-
-# Same volume as above, but mounts to different location
-# [volume biodata2]
-# (attach 1st partition of volume vol-c9999999 to /opt/ on master node)
-# VOLUME_ID = vol-c999999
-# MOUNT_PATH = /opt/
-
-# Another volume example 
-# [volume oceandata]
-# (attach 1st partition of volume vol-d7777777 to /mydata on master node)
-# VOLUME_ID = vol-d7777777
-# MOUNT_PATH = /mydata
-
-# Same as oceandata only uses the 2nd partition instead
-# [volume oceandata]
-# (attach 2nd partition of volume vol-d7777777 to /mydata on master node)
-# VOLUME_ID = vol-d7777777
-# MOUNT_PATH = /mydata
-# PARTITION = 2
-
-#####################################
-## Configuring StarCluster Plugins ##
-#####################################
-
-# Sections starting with "plugin" define a custom python class
-# which can perform additional configurations to StarCluster's default routines. These plugins 
-# can be assigned to a cluster template to customize the setup procedure when
-# starting a cluster from this template
-# (see the commented PLUGINS setting in the 'smallcluster' template above) 
-# Below is an example of defining a plugin called 'myplugin':
-
-# [plugin myplugin]
-# myplugin module either lives in ~/.starcluster/plugins or is 
-# in your PYTHONPATH
-# SETUP_CLASS = myplugin.SetupClass
-# extra settings are passed as arguments to your plugin:
-# SOME_PARAM_FOR_MY_PLUGIN = 1
-# SOME_OTHER_PARAM = 2
 
