@@ -42,4 +42,3 @@ For the number of chunks, figure the number of nodes in the cluster times the nu
 ```
 $ starcluster -c starcluster.cfg stop RUMcluster
 ```
-
