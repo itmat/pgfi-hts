@@ -12,7 +12,7 @@ $ sudo easy_install StarCluster
 
 ## 2. Set Up Configuration File ##
 
-You'll need a Starcluster configuration file, for which the `starcluster.cfg.tpl` in this directory acts as a template.  You need to edit it, and fill in the appropriate AWS keys and IDs and whatnot, and also point the `clusterkey` to an appropriate `.pem` file.  Decide how many virtual boxes you want to spin up, and how big they should be, etc.  (I had trouble spinning up more than 19 for a cluster, but maybe that was a fluke).
+You'll need a Starcluster configuration file, for which the `starcluster.cfg.tpl` in this directory acts as a template.  You need to edit it, and fill in the appropriate AWS keys and IDs and whatnot, and also point the `clusterkey` to an appropriate `.pem` file.  Decide how many virtual boxes you want to spin up, and how big they should be, etc.  Amazon has a limit of 20 on-demand or reserved instances (Starcluster says it can handle spot instances, but that the functionality is in beta.)
 
 ## 3. Make a Work Volume ##
 
@@ -48,19 +48,35 @@ In order to make things easier regarding write permissions and all, I just do ev
 
 ```
 masternode$ sudo su -
-masternode# cd /mnt/RUM/RUM
+masternode# cd /opt/RUM/RUM
 ```
 
 Edit the config file in the `lib` directory as appropriate: the filenames should be absolute paths if at all possible.  You should probably write the output back to the same volume; otherwise you'll have to make sure by other means that wherever you're writing to is accessible (with NFS) to all the cluster nodes.  
 
-Retrieve the reads file either from s3 or your local machine and upload it to the master node, on the NFS-shared volume.  [S3cmd](http://s3tools.org/s3cmd) may be helpful with this, but I don't think it comes installed.  (OK, I'm working on making an AMI which has this stuff installed already, but instance-store AMIs are not documented well.  Better instructions on s3cmd and how to use it coming when I have that set up.)
+Retrieve the reads file either from s3 or your local machine and upload it to the master node, on the NFS-shared volume.  [S3cmd](http://s3tools.org/s3cmd) is installed on the AMI, so you should be able to retrieve stuff from s3.
+
+### To Use SCP ###
+
+You can copy files to/from the cluster (use its shared directory!) with scp as usual, using the key file specified in the starcluster config file to identify (`clusterkey.pem`).  To find out the names of the machines, use `starcluster -c starcluster.cfg listclusters` (on your local machine) to see the clusters currently running and the names of the machines in each one (we're only dealing with one at the moment).
+
+### To use S3Cmd ###
+
+While logged into the master node, run
+
+    s3cmd --configure
+    
+to configure s3cmd for accessing your s3 buckets.  Then you can use
+
+    s3cmd get s3://BUCKET/OBJECT LOCALFILE
+    
+to download things from s3 buckets, and you can use `s3cmd put` to upload stuff into s3, and various other s3 commands (see `s3cmd --help`).
 
 ## 7. Run RUM ##
 
 Then you should be able to run RUM:
 
 ```
-masternode# perl ./RUM_runner.pl lib/rum.config_platypus reads.fa /mnt/RUM/RUM/data 40 "Cluster run" --qsub
+masternode# perl ./RUM_runner.pl lib/rum.config_platypus reads.fa /opt/RUM/RUM/data 40 "Cluster run" --qsub
 ```
 
 For the number of chunks, figure the number of nodes in the cluster times the number of cores per node (2 for a High-Memory XL node, 4 for a High-Memory 2XL node, and 8 for a High-Memory 4XL node.  You should be using High-Memory nodes in most cases; you need at least 6-7GB of memory for each chunk).  And watch it go! 

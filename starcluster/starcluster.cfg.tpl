@@ -46,8 +46,9 @@ CLUSTER_USER = sgeadmin
 # (options: tcsh, zsh, csh, bash, ksh)
 CLUSTER_SHELL = bash
 
-# AMI for cluster nodes.
-NODE_IMAGE_ID = ami-0af31963
+# AMI for cluster nodes. ami-0af31963 is the ordinary x86_64 AMI
+# This one has s3cmd built in.
+NODE_IMAGE_ID = ami-ca8e75a3
 # instance type for all cluster nodes 
 # (options: m1.large, c1.xlarge, m1.small, c1.medium, m1.xlarge, m2.4xlarge, m2.2xlarge)
 NODE_INSTANCE_TYPE = m2.2xlarge
@@ -86,6 +87,6 @@ VOLUMES = RUMrun
 
 [volume RUMrun]
 VOLUME_ID = vol-zzzzzzzz
-MOUNT_PATH = /mnt/RUM/
+MOUNT_PATH = /opt/RUM/
 PARTITION = 1
 
